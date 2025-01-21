@@ -92,13 +92,6 @@ public class BlogPostServiceImpl implements BlogPostService{
 	}
 
 	@Override
-	public BlogPostDTO findByBlogPostId(Integer id) {
-		Optional<BlogPost> findById = blogPostRepo.findById(id);
-		BlogPost blogPost = findById.orElseThrow(() -> new NoResourceFound("BlogPost", "Id", id));
-		return mapEntityToDto(blogPost);
-	}
-
-	@Override
 	public BlogPost findBlogPostId(Integer blogPostId) {
 		Optional<BlogPost> findById = blogPostRepo.findById(blogPostId);
 		BlogPost blogPost = findById.orElseThrow(() -> new NoResourceFound("BlogPost", "Id", blogPostId));

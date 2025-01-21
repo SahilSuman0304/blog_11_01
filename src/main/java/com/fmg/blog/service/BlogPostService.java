@@ -8,8 +8,6 @@ import com.fmg.blog.entities.BlogPost;
 public interface BlogPostService {
 	public BlogPostDTO createObject(BlogPostDTO blogPostDTO);
 
-	public BlogPostDTO findByBlogPostId(Integer id);
-
 	List<BlogPostDTO> getAllBlogPost();
 
 	BlogPostDTO updateBlogPost(BlogPostDTO blogPostDTO);
