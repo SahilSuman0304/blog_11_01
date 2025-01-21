@@ -1,5 +1,6 @@
 package com.fmg.blog.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +11,17 @@ import com.fmg.blog.entities.BlogPost;
 import com.fmg.blog.exception.NoResourceFound;
 import com.fmg.blog.repo.BlogPostRepo;
 import com.fmg.blog.service.BlogPostService;
+
+import jakarta.transaction.Transactional;
+
+
+@Transactional
 @Service
 public class BlogPostServiceImpl implements BlogPostService{
 	
-	
+	@Autowired
 	private  BlogPostRepo  blogPostRepo;
 	
-	@Autowired
 	public BlogPostServiceImpl(BlogPostRepo blogPostRepo) {
 		super();
 		this.blogPostRepo = blogPostRepo;
@@ -34,6 +39,7 @@ public class BlogPostServiceImpl implements BlogPostService{
 		blogPost.setContent(blogPostDTO.getContent());
 		blogPost.setDescription(blogPostDTO.getDescription());
 		blogPost.setTitle(blogPostDTO.getTitle());
+		blogPost.setBlogId(blogPostDTO.getBlogID());
 		return blogPost;
 
 	}
@@ -54,6 +60,62 @@ public class BlogPostServiceImpl implements BlogPostService{
 		Optional <BlogPost> findId = blogPostRepo.findById(Id);
 		BlogPost post = findId.orElseThrow(() -> new NoResourceFound("BlogPost", "Id", Id));
 		return mapEntityToDto(post);
+	}
+	
+	@Override
+	public List<BlogPostDTO> getAllBlogPost(){
+		List<BlogPost> findAll = blogPostRepo.findAll();
+		// using stream
+		 return findAll.stream().map(blogpost -> mapEntityToDto(blogpost)).toList();
+
+		// using core java
+//		List<BlogPostDTO> blogpostDtos = new ArrayList<>();
+//		for (BlogPost blogPost : findAll) {
+//			blogpostDtos.add(mapEntityToDto(blogPost));
+//
+//		}
+//		return blogpostDtos;
+	}
+	
+	@Override
+	public BlogPostDTO updateBlogPost(BlogPostDTO blogpostdto) {
+		Optional<BlogPost> findbyID = blogPostRepo.findByTitle(blogpostdto.getTitle());
+		//findbyID.orElseThrow(() ->new NoResourceFound("BlogPost", "ID", blogpostdto.getBlogID() ));
+		BlogPost update = null;
+		if(findbyID.isPresent()) {
+			update = blogPostRepo.save(mapDtoToEntity(blogpostdto));	
+		}else {
+			throw new NoResourceFound("BlogPost", "ID", blogpostdto.getBlogID());
+		}
+		
+		return mapEntityToDto(update);
+	}
+
+	@Override
+	public BlogPostDTO findByBlogPostId(Integer id) {
+		Optional<BlogPost> findById = blogPostRepo.findById(id);
+		BlogPost blogPost = findById.orElseThrow(() -> new NoResourceFound("BlogPost", "Id", id));
+		return mapEntityToDto(blogPost);
+	}
+
+	@Override
+	public BlogPost findBlogPostId(Integer blogPostId) {
+		Optional<BlogPost> findById = blogPostRepo.findById(blogPostId);
+		BlogPost blogPost = findById.orElseThrow(() -> new NoResourceFound("BlogPost", "Id", blogPostId));
+	return blogPost;
+	}
+
+	@Override
+	public void delete(BlogPost blogPost) {
+		blogPostRepo.delete(blogPost);
+		
+	}
+
+	@Override
+	public BlogPostDTO deletePostById(Integer id) {
+		BlogPost blogPost = blogPostRepo.findById(id).orElseThrow(() -> new NoResourceFound("BlogPost", "Id", id));
+		blogPostRepo.deleteById(id);
+		return mapEntityToDto(blogPost);
 	}
 
 	
