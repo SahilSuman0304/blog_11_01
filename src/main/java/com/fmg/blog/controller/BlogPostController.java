@@ -3,6 +3,8 @@ package com.fmg.blog.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,10 +41,19 @@ public class BlogPostController {
 		return new ResponseEntity(createBlogPost,HttpStatus.CREATED);
 	}
 	@GetMapping("/findAll")
-	public ResponseEntity<BlogPostDTO> getAllBlogPost(){
-		List<BlogPostDTO> getById=blogPostService.getAllBlogPost();
-		getById.forEach(s -> System.out.println(s));
-		return new ResponseEntity(getById, HttpStatus.OK);
+	public ResponseEntity<BlogPostDTO> getAllBlogPost(
+			@RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo,
+	        @RequestParam(value = "pageSize", defaultValue = "5", required = false) Integer pageSize,
+	        @RequestParam(value = "sortBy", defaultValue = "blogId", required = false) String sortBy,
+	        @RequestParam(value = "sortDir", defaultValue = "ASC", required = false) String sortDir
+			){
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+				?Sort.by(sortBy).ascending():
+					Sort.by(sortBy).descending();
+		
+		PageRequest pageable = PageRequest.of(pageNo, pageSize,sort);
+		List<BlogPostDTO> getById=blogPostService.getAllBlogPost(pageable);
+			return new ResponseEntity(getById, HttpStatus.OK);
 	}
 	
 	@PutMapping("/update")

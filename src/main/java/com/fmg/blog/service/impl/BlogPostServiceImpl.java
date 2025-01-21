@@ -2,8 +2,11 @@ package com.fmg.blog.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.fmg.blog.dto.BlogPostDTO;
@@ -63,10 +66,11 @@ public class BlogPostServiceImpl implements BlogPostService{
 	}
 	
 	@Override
-	public List<BlogPostDTO> getAllBlogPost(){
-		List<BlogPost> findAll = blogPostRepo.findAll();
-		// using stream
-		 return findAll.stream().map(blogpost -> mapEntityToDto(blogpost)).toList();
+	public List<BlogPostDTO> getAllBlogPost(PageRequest pageRequest){
+		// normal ways
+//		List<BlogPost> findAll = blogPostRepo.findAll();
+//		// using stream
+//		 return findAll.stream().map(blogpost -> mapEntityToDto(blogpost)).toList();
 
 		// using core java
 //		List<BlogPostDTO> blogpostDtos = new ArrayList<>();
@@ -75,6 +79,14 @@ public class BlogPostServiceImpl implements BlogPostService{
 //
 //		}
 //		return blogpostDtos;
+		// pagination
+		Page <BlogPost> findAll = blogPostRepo.findAll(pageRequest);
+		List<BlogPost> blogPost=findAll.getContent();
+		List<BlogPostDTO> list = blogPost.stream()
+				.map(this::mapEntityToDto)
+				.collect(Collectors.toList());
+		
+		return list;
 	}
 	
 	@Override
@@ -110,6 +122,5 @@ public class BlogPostServiceImpl implements BlogPostService{
 		blogPostRepo.deleteById(id);
 		return mapEntityToDto(blogPost);
 	}
-
 	
 }

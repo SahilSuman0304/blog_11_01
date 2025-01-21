@@ -2,13 +2,15 @@ package com.fmg.blog.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+
 import com.fmg.blog.dto.BlogPostDTO;
 import com.fmg.blog.entities.BlogPost;
 
 public interface BlogPostService {
 	public BlogPostDTO createObject(BlogPostDTO blogPostDTO);
 
-	List<BlogPostDTO> getAllBlogPost();
+	List<BlogPostDTO> getAllBlogPost(PageRequest of);
 
 	BlogPostDTO updateBlogPost(BlogPostDTO blogPostDTO);
 
